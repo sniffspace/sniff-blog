@@ -33,7 +33,7 @@
 			if ( is_search() || ! is_singular() && 'summary' === get_theme_mod( 'blog_content', 'full' ) ) {
 				the_excerpt();
 			} else {
-				the_content( __( 'Read more', 'twentytwenty' ) );
+				the_content( __( 'Continue reading', 'twentytwenty' ) );
 			}
 			?>
 
@@ -74,10 +74,10 @@
 
 	}
 
-	/**
-	 *  Output comments wrapper if it's a post, or if comments are open,
+	/*
+	 * Output comments wrapper if it's a post, or if comments are open,
 	 * or if there's a comment number – and check for password.
-	 * */
+	 */
 	if ( ( is_single() || is_page() ) && ( comments_open() || get_comments_number() ) && ! post_password_required() ) {
 		?>
 

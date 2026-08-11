@@ -5,8 +5,6 @@
 
 jQuery(document).ready(function($) {
   /**
-   *
-   *
    * Loads the relevant sub-selector based on the primary selector.
    */
   $(document).on('change', 'select.type-select', function() {
@@ -21,8 +19,6 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   *
-   *
    * When a select box is changed, send that new value to our input.
    */
   $(document).on('change', 'select.url-selector', function() {
@@ -33,12 +29,8 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   *
    * Edit a Redirect
-   *
    * Gets the redirect edit form, and replaces the row.
-   *
-   *
    */
   $('.eps-table').on('click', '.redirect-actions a.eps-redirect-edit', function(
     e
@@ -56,7 +48,6 @@ jQuery(document).ready(function($) {
       },
       success: function(data) {
         var data = jQuery.parseJSON(data);
-        console.log(data);
         $('#eps-redirect-edit').remove();
         $('tr.redirect-entry').removeClass('active');
         $('tr.redirect-entry[data-id=' + data.redirect_id + ']').addClass(
@@ -75,13 +66,8 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   *
-   *
    * Cancel an Edit.
-   *
    * Cancels the Edit implement on a redirect entry.
-   *
-   *
    */
   $('.eps-table').on('click', 'a.eps-redirect-cancel', function(e) {
     e.preventDefault();
@@ -91,12 +77,8 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   *
-   *
    * AJAX Save a New or Existing Redirect.
-   *
    * Checks for a form submission, then handles it VIA ajax.
-   *
    */
   $('.eps-table').on('submit', '#eps-redirect-save', function(e) {
     e.preventDefault();
@@ -147,11 +129,8 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   *
    * New Redirect.
-   *
    * Get a new blank edit form for a new redirect.
-   *
    * We expect to receive an id of 0 returned from the Ajax query.
    *
    */
@@ -160,7 +139,6 @@ jQuery(document).ready(function($) {
     $(this).prop('disabled', true);
     $(this).attr('disabled', 'disabled'); // Disable button to disallow multiple submissions.
 
-    // Do the request
     $.ajax({
       type: 'POST',
       url: ajaxurl,
@@ -179,28 +157,30 @@ jQuery(document).ready(function($) {
           $('#eps-redirect-add').hide();
           $(data.html).insertBefore('tr#eps-redirect-add');
         } else {
-          // If it's a new blank form.. why have an id?
           alert('Something strange happened. A new entry could not be loaded.');
         }
-        $(this).prop('disabled', false);
-        $(this).attr('disabled', false); // Disable button to disallow multiple submissions.
+        $('#eps-redirect-new').removeProp('disabled');
+        $('#eps-redirect-new').attr('disabled', false); // Disable button to disallow multiple submissions.
       },
       error: function() {
         // failed request; give feedback to user
         alert('A new entry form could not be loaded.');
-        $(this).prop('disabled', false);
-        $(this).attr('disabled', false); // Disable button to disallow multiple submissions.
+        $('#eps-redirect-new').removeProp('disabled');
+        $('#eps-redirect-new').attr('disabled', false); // Disable button to disallow multiple submissions.
       }
     });
   });
 
   /**
-   *
-   *
    * Delete an entry.
    */
   $('.redirect-actions a.eps-redirect-remove').on('click', function(e) {
     e.preventDefault();
+
+    if (!confirm('Are you sure you want to delete this redirect rule? There is no undo!')) {
+      return false;
+    }
+
     if ($(this).attr('disabled')) return false;
 
     $(this).prop('disabled', true);
@@ -220,12 +200,33 @@ jQuery(document).ready(function($) {
   });
 
   /**
-   *
-   *
+   * Delete all redirect rules
+   */
+   $('#eps_delete_rules').on('click', function(e) {
+    if (confirm('Are you sure you want to delete ALL redirect rules? There is NO undo!')) {
+      return true;
+    } else {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  /**
+   * Reset redirect stats
+   */
+   $('#eps_reset_stats').on('click', function(e) {
+    if (confirm('Are you sure you want to reset hits count on all redirect rules? There is NO undo!')) {
+      return true;
+    } else {
+      e.preventDefault();
+      return false;
+    }
+  });
+
+  /**
    * Tabs
    */
   $('#eps-tab-nav .eps-tab-nav-item').on('click', function(e) {
-    //e.preventDefault();
     var target = $(this).attr('href');
 
     $('#eps-tabs .eps-tab').hide();
@@ -238,4 +239,100 @@ jQuery(document).ready(function($) {
     $(this).addClass('active');
     //return false;
   });
-});
+
+  // PRO related stuff
+  $('.nav-tab-wrapper a.pro-ad').on('click', function(e) {
+    e.preventDefault();
+    pro_feature = 'tab';
+
+    $('#eps-pro-dialog').dialog('open');
+
+    $('#eps-pro-table .button-buy, .link-buy').each(function(ind, el) {
+      tmp = $(el).data('href-org');
+      tmp = tmp.replace('pricing-table', pro_feature);
+      $(el).attr('href', tmp);
+    });
+
+    return false;
+  });
+
+  $('#wpwrap').on('click', '.open-301-pro-dialog', function(e) {
+    e.preventDefault();
+
+    $('#eps-pro-dialog').dialog('open');
+
+    pro_feature = $(this).data('pro-feature');
+    if (!pro_feature) {
+      pro_feature = 'unknown';
+    }
+
+    $('#eps-pro-table .button-buy, .link-buy').each(function(ind, el) {
+      tmp = $(el).data('href-org');
+      tmp = tmp.replace('pricing-table', pro_feature);
+      $(el).attr('href', tmp);
+    });
+
+    return false;
+  });
+
+  $('#eps-pro-dialog').dialog({
+    dialogClass: 'wp-dialog eps-pro-dialog',
+    modal: true,
+    resizable: false,
+    width: 850,
+    height: 'auto',
+    show: 'fade',
+    hide: 'fade',
+    close: function (event, ui) {
+    },
+    open: function (event, ui) {
+      $(this).siblings().find('span.ui-dialog-title').html('WP 301 Redirects PRO is here!');
+      eps_fix_dialog_close(event, ui);
+    },
+    autoOpen: false,
+    closeOnEscape: true,
+  });
+
+  // show upsell popup every 3 months
+  if (window.localStorage.getItem('wp301_upsell_timestamp') === null ||
+      (new Date().getTime() / 1000 - window.localStorage.getItem('wp301_upsell_timestamp')) > (86400 * 90)) {
+    window.localStorage.setItem('wp301_upsell_timestamp', Math.round(new Date().getTime() / 1000));
+
+    $('#eps-pro-table .button-buy, .link-buy').each(function(ind, el) {
+      tmp = $(el).data('href-org');
+      tmp = tmp.replace('pricing-table', 'welcome');
+      $(el).attr('href', tmp);
+    });
+    $('#eps-pro-dialog').dialog('open');
+  }
+
+  if(window.location.hash == '#open-pro-dialog' && !eps_301.auto_open_pro_dialog) {
+    pro_feature = 'url-hash';
+
+    $('#eps-pro-dialog').dialog('open');
+
+    $('#eps-pro-table .button-buy, .link-buy').each(function(ind, el) {
+      tmp = $(el).data('href-org');
+      tmp = tmp.replace('pricing-table', pro_feature);
+      $(el).attr('href', tmp);
+    });
+  };
+
+  $('.install-wpcaptcha').on('click',function(e){
+    if (!confirm('The free WP Advanced Google ReCaptcha plugin will be installed & activated from the official WordPress repository.')) {
+      return;
+    }
+
+    jQuery('body').append('<div style="width:550px;height:450px; position:fixed;top:10%;left:50%;margin-left:-275px; color:#444; background-color: #fbfbfb;border:1px solid #DDD; border-radius:4px;box-shadow: 0px 0px 0px 4000px rgba(0, 0, 0, 0.85);z-index: 9999999;"><iframe src="' + eps_301.wpcaptcha_install_url + '" style="width:100%;height:100%;border:none;" /></div>');
+    jQuery('#wpwrap').css('pointer-events', 'none');
+
+    e.preventDefault();
+    return false;
+  });
+}); // on ready
+
+function eps_fix_dialog_close(event, ui) {
+  jQuery('.ui-widget-overlay').bind('click', function () {
+    jQuery('#' + event.target.id).dialog('close');
+  });
+} // eps_fix_dialog_close
