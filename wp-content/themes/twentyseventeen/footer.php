@@ -11,20 +11,41 @@
  * @since Twenty Seventeen 1.0
  * @version 1.2
  */
+
 ?>
-</main>
-<?php
-	$path = URI::getLiveTemplatePath();
-	$data = loadBlock('mod_front', 'block_footer', 'BlockFooter'); ?>
-<?php
-	wp_footer(); 
-?>
-<script type="text/javascript">var recaptchaPrivateKey = '<?php echo CFG::$reCapPrivateKey ?>';</script>
-<script src="<?php echo $path ?>/js/jquery.validate.js" type="text/javascript"></script>
-<script src="https://www.google.com/recaptcha/api.js?render=<?php echo CFG::$reCapPrivateKey ?>"></script>
-<script src="<?php echo $path ?>/js/lightgallery.js" type="text/javascript"></script>
-<script src="<?php echo $path ?>/js/custom.js" type="text/javascript"></script>
-<script async defer crossorigin="anonymous" src="https://connect.facebook.net/en_US/sdk.js"></script>
-</div>
+
+		</div><!-- #content -->
+
+		<footer id="colophon" class="site-footer">
+			<div class="wrap">
+				<?php
+				get_template_part( 'template-parts/footer/footer', 'widgets' );
+
+				if ( has_nav_menu( 'social' ) ) :
+					?>
+					<nav class="social-navigation" aria-label="<?php esc_attr_e( 'Footer Social Links Menu', 'twentyseventeen' ); ?>">
+						<?php
+							wp_nav_menu(
+								array(
+									'theme_location' => 'social',
+									'menu_class'     => 'social-links-menu',
+									'depth'          => 1,
+									'link_before'    => '<span class="screen-reader-text">',
+									'link_after'     => '</span>' . twentyseventeen_get_svg( array( 'icon' => 'chain' ) ),
+								)
+							);
+						?>
+					</nav><!-- .social-navigation -->
+					<?php
+				endif;
+
+				get_template_part( 'template-parts/footer/site', 'info' );
+				?>
+			</div><!-- .wrap -->
+		</footer><!-- #colophon -->
+	</div><!-- .site-content-contain -->
+</div><!-- #page -->
+<?php wp_footer(); ?>
+
 </body>
 </html>

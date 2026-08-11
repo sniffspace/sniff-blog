@@ -18,10 +18,19 @@ class Compatibility {
 	protected $default_whitelisted_plugins;
 
 	public function __construct() {
-
 		$this->muplugin_class_dir = plugin_dir_path( __FILE__ );
 		$this->muplugin_dir       = ( defined( 'WPMU_PLUGIN_DIR' ) && defined( 'WPMU_PLUGIN_URL' ) ) ? WPMU_PLUGIN_DIR : trailingslashit( WP_CONTENT_DIR ) . 'mu-plugins';
 
+		
+	}
+
+	/**
+	 * Registers action and filter hooks
+	 *
+	 * @return void
+	 **/
+	public function register()
+	{
 		add_action( 'admin_init', array( $this, 'wpmdbc_tgmpa_compatibility' ), 1 );
 		add_filter( 'option_active_plugins', array( $this, 'wpmdbc_include_plugins' ) );
 		add_filter( 'site_option_active_sitewide_plugins', array( $this, 'wpmdbc_include_site_plugins' ) );
@@ -66,7 +75,7 @@ class Compatibility {
 		$force_enable_theme = apply_filters( 'wpmdb_compatibility_enable_theme', false );
 
 		if ( $this->wpmdbc_is_compatibility_mode_request() && ! $force_enable_theme ) {
-			$theme_dir  = realpath( dirname( __FILE__ ) . '/../compatibility' );
+			$theme_dir  = realpath( dirname( __FILE__ ) . '/../Compatibility' );
 			$stylesheet = 'temp-theme';
 			$theme_root = "$theme_dir/$stylesheet";
 
@@ -215,6 +224,106 @@ class Compatibility {
 	}
 
 	/**
+	 * Check the request header has a connection key and is correct.
+	 *
+	 * @return bool
+	 */
+	private function is_key_header_valid() {
+		if ( ! isset( $_SERVER[ 'HTTP_X_WPMDB_MP_KEY' ] ) ) {
+			error_log('The WPMDB compatibility mu-plugin could not find an auth key in HTTP headers.');
+			return false;
+		}
+
+		$key_from_header = sanitize_text_field( wp_unslash( $_SERVER[ 'HTTP_X_WPMDB_MP_KEY' ] ) );
+
+		$settings = get_site_option( 'wpmdb_settings' );
+		if ( ! is_array( $settings ) || ! isset( $settings['mu_plugin_auth_key'] ) ) {
+			return false;
+		}
+
+		$key_from_settings = $settings['mu_plugin_auth_key'];
+
+		if ( ! hash_equals( $key_from_settings, $key_from_header ) ) {
+			error_log('The WPMDB compatibility mu-plugin was passed an incorrect key.');
+			return false;
+		}
+
+		return true;
+	}
+
+    /**
+     * Checks if the current request is a WPMDB REST API migration request.
+     *
+     * Uses `$_SERVER` global since we're attempting to grab the current
+     * route _before_ `rest_api_init` is fired by WordPress core.
+     *
+     * @return bool
+     */
+	public function wpmdbc_is_wpmdb_rest_request() {
+		$api_base    = 'mdb-api/v1/';
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? $_SERVER['REQUEST_URI'] : '';
+		$request_path = parse_url( $request_uri, PHP_URL_PATH );
+
+		// We need to check both regular endpoints and ?rest_route=<endpoint>
+		// Get the query string to check
+		$query_string = parse_url( $request_uri, PHP_URL_QUERY );
+		if ( $query_string ) {
+			parse_str( $query_string, $url_params );
+		} else {
+			$url_params = [];
+		}
+
+		if (
+			( isset( $url_params['rest_route'] ) && false === strpos( $url_params['rest_route'], $api_base ) ) ||
+		     false === strpos( $request_path, $api_base )
+		) {
+			// Rest route is not API base and path is not API base
+			return false;
+		}
+
+		if ( isset( $url_params['rest_route'] ) ) {
+			$full_endpoint = $url_params['rest_route'];
+		} else {
+			$full_endpoint = $request_path;
+		}
+
+		// Possible URL endpoint
+		$endpoint_segments = explode( $api_base, $full_endpoint );
+		$final_endpoint_segment = end( $endpoint_segments );
+
+	    $migration_endpoints = apply_filters(
+            'wpmdb_compatibility_mode_api_endpoints',
+            [
+                'initiate-migration',
+                'verify-connection',
+                'finalize-migration',
+                'cancel-migration',
+                'mf-initiate-file-migration',
+                'mf-get-queue-items',
+                'mf-transfer-files',
+                'tpf-initiate-file-migration',
+                'tpf-get-queue-items',
+                'tpf-transfer-files',
+                'prepare-upload',
+                'upload-file',
+                'import-file',
+            ]
+        );
+
+        // Checks that the current API call is a MDB migration request.
+        if (! in_array($final_endpoint_segment, $migration_endpoints)) {
+            return false;
+        }
+
+		// We have a REST endpoint. Let's check the key was sent in the header.
+		if ( ! $this->is_key_header_valid() ) {
+			return false;
+		}
+
+        return true;
+    }
+
+	/**
 	 * @return bool
 	 */
 	public function wpmdbc_is_wpmdb_flush_call() {
@@ -234,7 +343,11 @@ class Compatibility {
 	 * @return bool
 	 */
 	public function wpmdbc_is_compatibility_mode_request() {
-		//Requests that shouldn't be handled by compatibility mode
+		if ($this->wpmdbc_is_wpmdb_rest_request()) {
+			return true;
+		}
+
+		// Requests that shouldn't be handled by compatibility mode.
 		if ( ! $this->wpmdbc_is_wpmdb_ajax_call() || in_array( $_POST['action'], array(
 				'wpmdb_get_log',
 				'wpmdb_maybe_collect_data',
@@ -242,6 +355,7 @@ class Compatibility {
 				'wpmdb_remote_flush',
 				'wpmdb_get_themes',
 				'wpmdb_get_plugins',
+				'wpmdb_verify_connection_to_remote_site'
 			) ) ) {
 			return false;
 		}

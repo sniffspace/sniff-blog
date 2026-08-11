@@ -15,48 +15,44 @@
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?> class="no-js no-svg">
 <head>
-	<?php
-    APP::$appType = 'front';
-    $path = URI::getLiveTemplatePath();
-    wp_head();
-    ?>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="shortcut icon" href="<?php echo $path ?>/images/favicon.ico" type="image/x-icon"> 
-	<title><?php echo CFG::$siteConfig['site_name'] ?></title>
-	<meta content="<?php echo CFG::$siteConfig['site_name'] ?>" name="description">
-	<meta content="<?php echo CFG::$siteConfig['site_name'] ?>" name="keywords">
+<meta charset="<?php bloginfo( 'charset' ); ?>">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="profile" href="https://gmpg.org/xfn/11">
 
-	<link rel="stylesheet" href="<?php echo $path ?>/css/jquery.mCustomScrollbar.css">
-	<link rel="stylesheet" href="<?php echo $path ?>/css/style.css" type="text/css">
-	<link rel="stylesheet" href="<?php echo $path ?>/css/style01.css" type="text/css">
-	<link rel="stylesheet" href="<?php echo $path ?>/css/style02.css" type="text/css">
-	<script src="<?php echo $path ?>/js/jquery.min.js" type="text/javascript"></script>
-	<script src="<?php echo $path ?>/js/bootstrap.min.js" type="text/javascript"></script>
-	<script src="<?php echo $path ?>/js/bootstrap.bundle.min.js" type="text/javascript"></script>
-
-	<meta name="google-signin-scope" content="profile email">
-	<meta name="google-signin-client_id" content="<?php echo CFG::$GoogleClientId ?>">
-	<script src="https://apis.google.com/js/platform.js" async defer></script>
-	<script src="<?php echo $path ?>/js/facebook.js"></script>
+<?php wp_head(); ?>
 </head>
 
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
-<div class="wrapper">
+<div id="page" class="site">
+	<a class="skip-link screen-reader-text" href="#content">
+		<?php
+		/* translators: Hidden accessibility text. */
+		_e( 'Skip to content', 'twentyseventeen' );
+		?>
+	</a>
+
+	<header id="masthead" class="site-header">
+
+		<?php get_template_part( 'template-parts/header/header', 'image' ); ?>
+
+		<?php if ( has_nav_menu( 'top' ) ) : ?>
+			<div class="navigation-top">
+				<div class="wrap">
+					<?php get_template_part( 'template-parts/navigation/navigation', 'top' ); ?>
+				</div><!-- .wrap -->
+			</div><!-- .navigation-top -->
+		<?php endif; ?>
+
+	</header><!-- #masthead -->
+
 	<?php
-        $data = loadBlock('mod_front', 'block_header', 'BlockHeader');
+	if ( twentyseventeen_should_show_featured_image() ) :
+		echo '<div class="single-featured-image-header">';
+		echo get_the_post_thumbnail( get_queried_object_id(), 'twentyseventeen-featured-image' );
+		echo '</div><!-- .single-featured-image-header -->';
+	endif;
+	?>
 
-        function loadBlock($module, $block, $class) {
-            include(CFG::$absPath . '/modules/' . $module . '/block/' . $block . '/' . $block . '.php');
-
-                //BlockFooter::process();
-            $newclass = new $class();
-            $data = $newclass->process();
-                //eval($class::process($newclass));
-            include(CFG::$absPath . '/modules/' . $module . '/block/' . $block . '/view/' . $block . '.php');
-            return $data;
-        }
-        ?>
-        <div class="headerPadd"></div>
-		<main class="main-content">
+	<div class="site-content-contain">
+		<div id="content" class="site-content">
