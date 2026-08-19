@@ -43,6 +43,12 @@
 		overlay.hidden = true;
 	}
 
+	function closeDrawerOnDesktop() {
+		if ( window.innerWidth >= 768 ) {
+			closeDrawer();
+		}
+	}
+
 	if ( drawer && trigger && overlay ) {
 		trigger.addEventListener( 'click', openDrawer );
 
@@ -123,8 +129,12 @@
 	}
 
 	window.addEventListener( 'scroll', updateScrollUi, { passive: true } );
-	window.addEventListener( 'resize', updateScrollUi );
+	window.addEventListener( 'resize', function() {
+		updateScrollUi();
+		closeDrawerOnDesktop();
+	} );
 	updateScrollUi();
+	closeDrawerOnDesktop();
 
 	if ( backToTopButton ) {
 		backToTopButton.addEventListener( 'click', function() {

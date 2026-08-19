@@ -80,11 +80,12 @@ $sniffspace_has_mobile_menu = ! empty( $sniffspace_mobile_parents );
 					);
 				endif;
 				?>
-
+				<?php /*
 				<div class="ss-header-actions">
 					<a class="ss-login-button" href="#" title="<?php esc_attr_e( 'Log In', 'sniffspace' ); ?>"><?php esc_html_e( 'Log In', 'sniffspace' ); ?></a>
 					<a class="ss-signup-button" href="#" title="<?php esc_attr_e( 'Sign Up', 'sniffspace' ); ?>"><?php esc_html_e( 'Sign Up', 'sniffspace' ); ?></a>
 				</div>
+				*/ ?>
 			</div>
 		</div>
 	</header>
@@ -98,12 +99,13 @@ $sniffspace_has_mobile_menu = ! empty( $sniffspace_mobile_parents );
 			</a>
 			<button class="ss-drawer-close" type="button" data-ss-drawer-close aria-label="<?php esc_attr_e( 'Close menu', 'sniffspace' ); ?>" title="<?php esc_attr_e( 'Close menu', 'sniffspace' ); ?>">&times;</button>
 		</div>
-
+		<?php /*
 		<div class="ss-drawer-auth">
 			<a class="ss-drawer-login" href="#" title="<?php esc_attr_e( 'Log In', 'sniffspace' ); ?>"><?php esc_html_e( 'Log In', 'sniffspace' ); ?></a>
 			<a class="ss-drawer-signup" href="#" title="<?php esc_attr_e( 'Sign Up', 'sniffspace' ); ?>"><?php esc_html_e( 'Sign Up', 'sniffspace' ); ?></a>
 		</div>
-
+		*/ ?>
+		
 		<nav class="ss-drawer-nav" aria-label="<?php esc_attr_e( 'Mobile menu links', 'sniffspace' ); ?>">
 			<?php
 			$sniffspace_first_panel_opened = false;
