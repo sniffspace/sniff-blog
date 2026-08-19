@@ -176,6 +176,7 @@ button:focus-visible {
 	align-items: center;
 	justify-content: flex-end;
 	margin-left: auto;
+	margin-right: 10px;
 	min-width: 0;
 }
 
@@ -453,14 +454,13 @@ button:focus-visible {
 	background: transparent;
 	color: #070707;
 	text-decoration: none;
-	transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+	transition: all .4s ease-in-out;
 }
 
 .ss-store-button:hover,
 .ss-store-button:focus-visible {
-	border-color: var(--ss-green);
-	box-shadow: 0 8px 20px rgba(118, 176, 65, 0.16);
-	transform: translateY(-1px);
+	background: #070707;
+	color: #ffffff;
 }
 
 .ss-store-button svg {
@@ -477,7 +477,7 @@ button:focus-visible {
 .ss-store-button small,
 .ss-store-button strong {
 	display: block;
-	color: #070707;
+	color: inherit;
 	letter-spacing: 0;
 }
 
@@ -1013,6 +1013,15 @@ button:focus-visible {
 }
 
 @media (min-width: 768px) {
+	.ss-mobile-drawer,
+	.ss-drawer-overlay {
+		display: none !important;
+	}
+
+	body.ss-drawer-open {
+		overflow: auto;
+	}
+
 	.ss-back-to-top {
 		display: flex;
 	}
