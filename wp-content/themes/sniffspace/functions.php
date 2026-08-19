@@ -254,6 +254,13 @@ function sniffspace_get_main_website_home_url() {
 }
 
 /**
+ * Return the WordPress blog root URL for blog breadcrumbs.
+ */
+function sniffspace_get_blog_home_url() {
+	return apply_filters( 'sniffspace_blog_home_url', home_url( '/' ) );
+}
+
+/**
  * Implement the Custom Header feature.
  */
 require get_template_directory() . '/inc/custom-header.php';

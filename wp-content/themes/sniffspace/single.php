@@ -9,7 +9,7 @@ get_header();
 
 $sniffspace_blog_page_id    = (int) get_option( 'page_for_posts' );
 $sniffspace_blog_title      = $sniffspace_blog_page_id ? get_the_title( $sniffspace_blog_page_id ) : __( 'Blog', 'sniffspace' );
-$sniffspace_blog_url        = $sniffspace_blog_page_id ? get_permalink( $sniffspace_blog_page_id ) : home_url( '/blog/' );
+$sniffspace_blog_url        = sniffspace_get_blog_home_url();
 $sniffspace_no_image_url    = get_template_directory_uri() . '/assets/images/no-image.png';
 $sniffspace_post_categories = get_the_category();
 $sniffspace_post_category   = ! empty( $sniffspace_post_categories ) ? $sniffspace_post_categories[0] : null;
