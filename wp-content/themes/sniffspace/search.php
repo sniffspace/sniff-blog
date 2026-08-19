@@ -9,7 +9,7 @@ get_header();
 
 $sniffspace_blog_page_id = (int) get_option( 'page_for_posts' );
 $sniffspace_blog_title   = $sniffspace_blog_page_id ? get_the_title( $sniffspace_blog_page_id ) : __( 'Blog', 'sniffspace' );
-$sniffspace_blog_url     = $sniffspace_blog_page_id ? get_permalink( $sniffspace_blog_page_id ) : home_url( '/blog/' );
+$sniffspace_blog_url     = sniffspace_get_blog_home_url();
 $sniffspace_search_query = get_search_query();
 $sniffspace_search_title = sprintf(
 	/* translators: %s: Search query. */
