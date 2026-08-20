@@ -159,6 +159,7 @@
 	text-decoration: underline;
 	text-underline-offset: 3px;
 	transition: color 0.22s ease, text-decoration-color 0.22s ease;
+	word-wrap: break-word;
 }
 
 .ss-single-content a:hover,

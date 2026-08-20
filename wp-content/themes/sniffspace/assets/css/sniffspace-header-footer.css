@@ -120,7 +120,7 @@ button:focus-visible {
 
 .ss-site-header.ss-header-scrolled {
 	background: var(--ss-surface);
-	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+	/* box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); */
 }
 
 .ss-header-frame {
@@ -930,10 +930,12 @@ button:focus-visible {
 	}
 
 	.ss-site-header {
-		position: static;
+		position: sticky;
+		top: 0;
+		z-index: 1000;
 		padding: 0;
 		box-shadow: none;
-		background: transparent;
+		background: #ffffff;
 	}
 
 	.ss-header-frame {
